@@ -39,25 +39,46 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
       const svgElement = chartRef.current.querySelector('svg');
       if (!svgElement) return;
 
-      // Clone and prepare SVG
+      // Clone the SVG to avoid modifying the original
       const svgClone = svgElement.cloneNode(true) as SVGElement;
       
-      // Ensure all styles are inline
+      // Force all styles to be inline for proper rendering
+      const styleSheets = Array.from(document.styleSheets);
       const allElements = svgClone.querySelectorAll('*');
+      
       allElements.forEach(el => {
         const computedStyle = window.getComputedStyle(el as Element);
-        const styleString = Array.from(computedStyle).map(key => 
-          `${key}:${computedStyle.getPropertyValue(key)}`
-        ).join(';');
-        (el as any).style.cssText = styleString;
+        let styleStr = '';
+        
+        // Get all computed styles
+        for (let i = 0; i < computedStyle.length; i++) {
+          const prop = computedStyle[i];
+          const value = computedStyle.getPropertyValue(prop);
+          if (value && value !== 'initial' && value !== 'inherit') {
+            styleStr += `${prop}: ${value}; `;
+          }
+        }
+        
+        if (styleStr) {
+          (el as any).setAttribute('style', styleStr);
+        }
       });
 
-      // Set SVG dimensions and background
+      // Ensure proper SVG attributes for standalone rendering
+      svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svgClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
       svgClone.setAttribute('width', '800');
       svgClone.setAttribute('height', '600');
-      svgClone.style.backgroundColor = 'white';
+      svgClone.setAttribute('viewBox', `0 0 800 600`);
+      
+      // Set white background
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('width', '100%');
+      rect.setAttribute('height', '100%');
+      rect.setAttribute('fill', 'white');
+      svgClone.insertBefore(rect, svgClone.firstChild);
 
-      // Create canvas
+      // Create high-resolution canvas
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
@@ -67,26 +88,34 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
       canvas.height = 600 * scale;
       ctx.scale(scale, scale);
 
-      // White background
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, 800, 600);
-
-      // Convert to blob and draw
+      // Convert SVG to data URL and render
       const svgData = new XMLSerializer().serializeToString(svgClone);
       const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
       const svgUrl = URL.createObjectURL(svgBlob);
 
       const img = new Image();
       img.onload = () => {
+        // Clear canvas with white background
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, 800, 600);
+        
+        // Draw the SVG
         ctx.drawImage(img, 0, 0, 800, 600);
         
+        // Download the image
         const link = document.createElement('a');
         link.download = '출산율-그래프.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
         
         URL.revokeObjectURL(svgUrl);
       };
+      
+      img.onerror = () => {
+        console.error('이미지 로드 실패');
+        URL.revokeObjectURL(svgUrl);
+      };
+      
       img.src = svgUrl;
     } catch (error) {
       console.error('차트 저장 중 오류가 발생했습니다:', error);
@@ -153,26 +182,60 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
                 scale="linear"
                 domain={['dataMin', 'dataMax']}
                 ticks={sortedData.map(d => d.year)}
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
+                tick={{ 
+                  fill: 'hsl(var(--muted-foreground))', 
+                  fontSize: 12,
+                  fontFamily: 'Arial, sans-serif'
+                }}
+                axisLine={{ 
+                  stroke: 'hsl(var(--border))',
+                  strokeWidth: 1
+                }}
+                tickLine={{
+                  stroke: 'hsl(var(--border))',
+                  strokeWidth: 1
+                }}
               >
                 <Label 
                   value="연도" 
                   position="insideBottom" 
                   offset={-5} 
-                  style={{ textAnchor: 'middle', fill: 'hsl(var(--card-foreground))', fontSize: '12px' }} 
+                  style={{ 
+                    textAnchor: 'middle', 
+                    fill: 'hsl(var(--card-foreground))', 
+                    fontSize: '14px',
+                    fontFamily: 'Arial, sans-serif',
+                    fontWeight: 'bold'
+                  }} 
                 />
               </XAxis>
               <YAxis
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                tick={{ 
+                  fill: 'hsl(var(--muted-foreground))', 
+                  fontSize: 12,
+                  fontFamily: 'Arial, sans-serif'
+                }}
                 domain={[0, 'dataMax + 0.3']}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
+                axisLine={{ 
+                  stroke: 'hsl(var(--border))',
+                  strokeWidth: 1
+                }}
+                tickLine={{
+                  stroke: 'hsl(var(--border))',
+                  strokeWidth: 1
+                }}
               >
                 <Label
                   value="출산율"
                   angle={-90}
                   position="insideLeft"
-                  style={{ textAnchor: 'middle', fill: 'hsl(var(--card-foreground))', fontSize: '12px' }}
+                  style={{ 
+                    textAnchor: 'middle', 
+                    fill: 'hsl(var(--card-foreground))', 
+                    fontSize: '14px',
+                    fontFamily: 'Arial, sans-serif',
+                    fontWeight: 'bold'
+                  }}
                 />
               </YAxis>
               <Tooltip content={<CustomTooltip />} />
