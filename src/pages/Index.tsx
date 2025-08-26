@@ -22,46 +22,44 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 p-4">
+      <div className="container mx-auto max-w-6xl h-screen flex flex-col">
+        {/* Compact Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
             대한민국 합계출산율 변화 탐색기
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            원하는 연도를 선택하여 데이터를 추가하고, 시간의 흐름에 따른 출산율 변화를 시각화해보세요.
+          <p className="text-sm text-muted-foreground">
+            연도를 선택하여 출산율 변화를 시각화해보세요
           </p>
         </div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-5 gap-6 mb-6">
-          {/* Left Panel - Data Input */}
-          <div className="lg:col-span-2">
-            <div className="max-w-xs mx-auto lg:mx-0">
-              <DataInputPanel
-                selectedData={selectedData}
-                onAddData={handleAddData}
-                onClearData={handleClearData}
-              />
-            </div>
+        {/* Main Content Grid - Tablet Optimized */}
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 min-h-0">
+          {/* Input Panel - Compact */}
+          <div className="md:col-span-1 flex flex-col">
+            <DataInputPanel
+              selectedData={selectedData}
+              onAddData={handleAddData}
+              onClearData={handleClearData}
+            />
           </div>
 
-          {/* Right Panel - Data Table */}
-          <div className="lg:col-span-3">
+          {/* Data Table - Scrollable */}
+          <div className="md:col-span-1 flex flex-col min-h-0">
             <DataTable 
               data={selectedData} 
               highlightedYear={highlightedYear}
             />
           </div>
-        </div>
 
-        {/* Bottom Panel - Chart */}
-        <div className="w-full">
-          <ChartPanel
-            data={selectedData}
-            onDataPointHover={handleDataPointHover}
-          />
+          {/* Chart Panel - Takes remaining space */}
+          <div className="md:col-span-2 flex flex-col min-h-0">
+            <ChartPanel
+              data={selectedData}
+              onDataPointHover={handleDataPointHover}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -39,12 +39,29 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
       const svgElement = chartRef.current.querySelector('svg');
       if (!svgElement) return;
 
+      // Clone and prepare SVG
+      const svgClone = svgElement.cloneNode(true) as SVGElement;
+      
+      // Ensure all styles are inline
+      const allElements = svgClone.querySelectorAll('*');
+      allElements.forEach(el => {
+        const computedStyle = window.getComputedStyle(el as Element);
+        const styleString = Array.from(computedStyle).map(key => 
+          `${key}:${computedStyle.getPropertyValue(key)}`
+        ).join(';');
+        (el as any).style.cssText = styleString;
+      });
+
+      // Set SVG dimensions and background
+      svgClone.setAttribute('width', '800');
+      svgClone.setAttribute('height', '600');
+      svgClone.style.backgroundColor = 'white';
+
       // Create canvas
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set high resolution
       const scale = 2;
       canvas.width = 800 * scale;
       canvas.height = 600 * scale;
@@ -54,8 +71,8 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, 800, 600);
 
-      // Convert SVG to image
-      const svgData = new XMLSerializer().serializeToString(svgElement);
+      // Convert to blob and draw
+      const svgData = new XMLSerializer().serializeToString(svgClone);
       const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
       const svgUrl = URL.createObjectURL(svgBlob);
 
@@ -63,7 +80,6 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
       img.onload = () => {
         ctx.drawImage(img, 0, 0, 800, 600);
         
-        // Download
         const link = document.createElement('a');
         link.download = '출산율-그래프.png';
         link.href = canvas.toDataURL('image/png');
@@ -98,14 +114,14 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
   };
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6" style={{ boxShadow: 'var(--shadow-chart)' }}>
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 p-4 shadow-elegant flex flex-col h-full">
+      <div className="flex justify-between items-center mb-3">
         <h2 className="text-lg font-semibold text-card-foreground">합계출산율 변화</h2>
         
         {data.length > 0 && (
           <button
             onClick={handleDownload}
-            className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity text-sm"
+            className="flex items-center gap-2 px-3 py-1.5 bg-gradient-primary text-white rounded-lg hover:shadow-glow transition-all duration-300 text-sm font-medium"
           >
             <DownloadIcon />
             저장
@@ -114,42 +130,49 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
       </div>
       
       {data.length === 0 ? (
-        <div className="h-96 flex items-center justify-center text-muted-foreground">
-          그래프를 보려면 데이터를 추가해주세요.
+        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-muted/30 flex items-center justify-center">
+              📊
+            </div>
+            <p className="text-sm">그래프를 보려면 데이터를 추가해주세요</p>
+          </div>
         </div>
       ) : (
-        <div ref={chartRef} className="h-96">
+        <div ref={chartRef} className="flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={sortedData}
-              margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
+              margin={{ top: 20, right: 20, left: 20, bottom: 40 }}
               onMouseLeave={() => onDataPointHover(undefined)}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
               <XAxis
                 dataKey="year"
                 type="number"
                 scale="linear"
                 domain={['dataMin', 'dataMax']}
                 ticks={sortedData.map(d => d.year)}
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
               >
                 <Label 
                   value="연도" 
                   position="insideBottom" 
-                  offset={-10} 
-                  style={{ textAnchor: 'middle', fill: 'hsl(var(--card-foreground))' }} 
+                  offset={-5} 
+                  style={{ textAnchor: 'middle', fill: 'hsl(var(--card-foreground))', fontSize: '12px' }} 
                 />
               </XAxis>
               <YAxis
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                domain={[0, 'dataMax + 0.5']}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                domain={[0, 'dataMax + 0.3']}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
               >
                 <Label
                   value="출산율"
                   angle={-90}
                   position="insideLeft"
-                  style={{ textAnchor: 'middle', fill: 'hsl(var(--card-foreground))' }}
+                  style={{ textAnchor: 'middle', fill: 'hsl(var(--card-foreground))', fontSize: '12px' }}
                 />
               </YAxis>
               <Tooltip content={<CustomTooltip />} />
@@ -158,12 +181,13 @@ export const ChartPanel: React.FC<ChartPanelProps> = ({ data, onDataPointHover }
                 dataKey="rate"
                 stroke="hsl(var(--primary))"
                 strokeWidth={3}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 5 }}
                 activeDot={{ 
-                  r: 6, 
+                  r: 7, 
                   fill: 'hsl(var(--primary))',
-                  stroke: 'hsl(var(--card))',
-                  strokeWidth: 2 
+                  stroke: 'hsl(var(--background))',
+                  strokeWidth: 3,
+                  filter: 'drop-shadow(0 0 6px hsl(var(--primary) / 0.5))'
                 }}
                 onMouseEnter={handleMouseEnter}
               />

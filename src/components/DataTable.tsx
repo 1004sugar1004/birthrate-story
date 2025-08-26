@@ -10,16 +10,20 @@ export const DataTable: React.FC<DataTableProps> = ({ data, highlightedYear }) =
   const sortedData = [...data].sort((a, b) => a.year - b.year);
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6" style={{ boxShadow: 'var(--shadow-panel)' }}>
+    <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 p-4 shadow-elegant flex flex-col h-full">
       <h2 className="text-lg font-semibold text-card-foreground mb-4">선택된 데이터</h2>
       
       {data.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          아직 선택된 데이터가 없습니다.<br />
-          좌측에서 연도를 입력해주세요.
+        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="text-center">
+            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-muted/30 flex items-center justify-center">
+              📋
+            </div>
+            <p className="text-sm">데이터를 추가하면 여기에 표시됩니다</p>
+          </div>
         </div>
       ) : (
-        <div className="overflow-y-auto max-h-96">
+        <div className="flex-1 overflow-y-auto min-h-0">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">

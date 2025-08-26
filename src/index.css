@@ -50,8 +50,8 @@ All colors MUST be HSL. Sky theme for data exploration.
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
     
     /* Shadows */
-    --shadow-chart: 0 10px 30px -10px hsl(var(--primary) / 0.1);
-    --shadow-panel: 0 4px 20px -4px hsl(215 32% 15% / 0.08);
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.15);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
 
     --radius: 0.5rem;
 
@@ -111,8 +111,8 @@ All colors MUST be HSL. Sky theme for data exploration.
     --active-dot: 200 98% 45%;
     
     /* Shadows - dark mode */
-    --shadow-chart: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
-    --shadow-panel: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-elegant: 0 10px 30px -10px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.4);
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
