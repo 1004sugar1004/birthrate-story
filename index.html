@@ -3,18 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>birthrate-story</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <title>대한민국 합계출산율 변화 탐색기</title>
+    <meta name="description" content="인터랙티브 출산율 데이터 시각화로 대한민국의 인구 변화를 탐색해보세요. 1970년부터 2023년까지의 합계출산율 데이터를 직접 선택하여 그래프로 확인할 수 있습니다." />
+    <meta name="author" content="출산율 데이터 탐색기" />
+    <meta name="keywords" content="출산율, 합계출산율, 인구통계, 데이터시각화, 대한민국, 통계청" />
 
-    <meta property="og:title" content="birthrate-story" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <meta property="og:title" content="대한민국 합계출산율 변화 탐색기" />
+    <meta property="og:description" content="인터랙티브 출산율 데이터 시각화로 대한민국의 인구 변화를 탐색해보세요" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
+    <meta name="twitter:title" content="대한민국 합계출산율 변화 탐색기" />
+    <meta name="twitter:description" content="인터랙티브 출산율 데이터 시각화" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <style>
+      /* 입력창 스타일 보정 (브라우저 자동완성 및 다크모드 대응) */
+      input[type="number"] {
+        color-scheme: light !important;
+        background-color: white !important;
+        color: #1e293b !important;
+      }
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+    </style>
   </head>
 
   <body>
